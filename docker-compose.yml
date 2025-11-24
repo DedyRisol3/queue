@@ -1,0 +1,80 @@
+services:
+  mysql-queue:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_queue
+    networks:
+      - app-network
+
+  mysql-admin:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_admin
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api-gateway:/var/www/html
+    networks:
+      - app-network
+
+  service-queue:
+    build:
+      context: ./service-queue
+    ports:
+      - "8001:8000"
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql-queue
+      DB_DATABASE: db_queue
+      REDIS_HOST: redis
+    volumes:
+      - ./service-queue:/var/www/html
+    depends_on:
+      - mysql-queue
+      - redis
+    networks:
+      - app-network
+
+  service-admin:
+    build:
+      context: ./service-admin
+    ports:
+      - "8002:8000"
+    environment:
+      DB_HOST: mysql-admin
+      DB_DATABASE: db_admin
+    volumes:
+      - ./service-admin:/var/www/html
+    depends_on:
+      - mysql-admin
+    networks:
+      - app-network
+
+  service-display:
+    build:
+      context: ./service-display
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./service-display:/var/www/html
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
