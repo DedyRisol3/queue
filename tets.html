@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambil Antrian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col items-center justify-center">
+
+    <h1 class="text-3xl font-bold mb-8 text-gray-700">Silahkan Pilih Layanan</h1>
+
+    <div class="grid grid-cols-2 gap-8">
+        <button onclick="takeTicket('A')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-10 px-12 rounded-xl shadow-lg text-2xl transition transform hover:scale-105">
+            Layanan A
+            <span class="block text-sm font-normal mt-2">Customer Service</span>
+        </button>
+
+        <button onclick="takeTicket('B')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-10 px-12 rounded-xl shadow-lg text-2xl transition transform hover:scale-105">
+            Layanan B
+            <span class="block text-sm font-normal mt-2">Teller / Kasir</span>
+        </button>
+    </div>
+
+    <div class="mt-8">
+        <input type="text" id="phone" placeholder="Nomor WA (08xxx)" class="p-3 border rounded w-64 text-center">
+    </div>
+
+    <script>
+        function takeTicket(sessionType) {
+            const phone = document.getElementById('phone').value;
+
+            // Hit ke API Gateway atau langsung ke Service Queue
+            // Karena ini frontend (browser), kita akses via localhost port yang diexpose (8001) atau via gateway (8000)
+            // Asumsi: Kita tembak langsung ke Service Queue yang diexpose di port 8001 (lihat docker-compose)
+            
+            axios.post('http://localhost:8001/api/tickets/take', {
+                session: sessionType,
+                phone: phone
+            })
+            .then(response => {
+                const ticket = response.data.data;
+                const waLink = response.data.wa_link;
+
+                let htmlContent = `<h1 class="text-5xl font-bold text-blue-600">${ticket.queue_number}</h1>`;
+                
+                if(waLink) {
+                    htmlContent += `<br><a href="${waLink}" target="_blank" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded">Kirim ke WA</a>`;
+                }
+
+                Swal.fire({
+                    title: 'Nomor Antrian Anda',
+                    html: htmlContent,
+                    icon: 'success',
+                    timer: 5000,
+                    showConfirmButton: true
+                });
+            })
+            .catch(error => {
+                Swal.fire('Error', 'Gagal mengambil antrian', 'error');
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+</html>

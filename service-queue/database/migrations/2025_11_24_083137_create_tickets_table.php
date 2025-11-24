@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->string('queue_number');
+            $table->char('session', 1);
             $table->enum('status', ['waiting', 'called', 'finished'])->default('waiting');
             $table->timestamps();
         });

@@ -2,9 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/ambil', function () {
-    return view('take');
-});
-Route::get('/display', function () {
+// Halaman Display TV (Monitor)
+Route::get('/', function () {
     return view('display');
+});
+
+// Halaman Kiosk (Tombol Ambil Antrian) -> INI WAJIB ADA
+Route::get('/kiosk', function () {
+    return view('take');
 });
