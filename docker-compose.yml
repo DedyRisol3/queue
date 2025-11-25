@@ -41,7 +41,10 @@ services:
     environment:
       DB_HOST: mysql-queue
       DB_DATABASE: db_queue
+      DB_USERNAME: root
+      DB_PASSWORD: root
       REDIS_HOST: redis
+      BROADCAST_CONNECTION: log
     volumes:
       - ./service-queue:/var/www/html
     depends_on:
@@ -58,6 +61,8 @@ services:
     environment:
       DB_HOST: mysql-admin
       DB_DATABASE: db_admin
+      DB_USERNAME: root        
+      DB_PASSWORD: root
     volumes:
       - ./service-admin:/var/www/html
     depends_on:

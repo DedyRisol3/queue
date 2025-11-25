@@ -6,23 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('queue_number');
-            $table->char('session', 1);
-            $table->enum('status', ['waiting', 'called', 'finished'])->default('waiting');
+            $table->string('queue_number'); // Contoh: A001, B001
+            $table->char('session', 1);     // A atau B
+            $table->enum('status', ['waiting', 'called', 'finished', 'skipped'])->default('waiting');
+            $table->string('user_phone')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('tickets');
